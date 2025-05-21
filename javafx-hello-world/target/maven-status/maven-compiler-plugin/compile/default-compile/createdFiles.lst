@@ -1,7 +1,0 @@
-se/lu/ics/App.class
-se/lu/ics/models/CreditCard.class
-se/lu/ics/models/Customer.class
-se/lu/ics/models/CustomerRegister.class
-se/lu/ics/controllers/AppController.class
-se/lu/ics/models/AppModel.class
-se/lu/ics/controllers/MainViewController.class
