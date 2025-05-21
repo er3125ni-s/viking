@@ -4,13 +4,17 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import javax.sql.DataSource;
 
 import se.lu.ics.model.Interview;
-import se.lu.ics.model.Candidate;
+import se.lu.ics.model.Applicant;
+import se.lu.ics.model.Recruitment;
+import se.lu.ics.model.InterviewStatus;
 
 /**
  * JDBC implementation of the InterviewDao interface.
@@ -28,6 +32,18 @@ public class InterviewDaoJdbc implements InterviewDao {
     }
     
     /**
+     * Constructor that takes a datasource
+     * @param ds The datasource to get a connection from
+     */
+    public InterviewDaoJdbc(DataSource ds) {
+        try {
+            this.connection = ds.getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to get database connection", e);
+        }
+    }
+    
+    /**
      * Maps a ResultSet row to an Interview object
      * @param rs The ResultSet containing interview data
      * @return A new Interview object
@@ -35,43 +51,61 @@ public class InterviewDaoJdbc implements InterviewDao {
      */
     private Interview map(ResultSet rs) throws SQLException {
         String id = rs.getString("id");
-        String candidateId = rs.getString("candidate_id");
-        String dateStr = rs.getString("date");
-        LocalDate date = LocalDate.parse(dateStr);
-        String result = rs.getString("result");
+        String applicantId = rs.getString("applicant_id");
+        String recruitmentId = rs.getString("recruitment_id");
+        LocalDateTime dateTime = rs.getTimestamp("date_time").toLocalDateTime();
+        String location = rs.getString("location");
+        String interviewer = rs.getString("interviewer");
+        String status = rs.getString("status");
+        String notes = rs.getString("notes");
         
-        // Find the associated Candidate
-        Candidate candidate = findCandidate(candidateId);
-        if (candidate == null) {
-            throw new SQLException("Associated Candidate not found for ID: " + candidateId);
-        }
+        // Find the associated Applicant
+        Applicant applicant = findApplicant(applicantId)
+            .orElseThrow(() -> new SQLException("Associated Applicant not found for ID: " + applicantId));
         
-        return new Interview(id, candidate, date, result);
+        // Find the associated Recruitment
+        Recruitment recruitment = findRecruitment(recruitmentId)
+            .orElseThrow(() -> new SQLException("Associated Recruitment not found for ID: " + recruitmentId));
+        
+        Interview interview = new Interview(id, recruitment, applicant, dateTime, location, interviewer, 
+                InterviewStatus.valueOf(status), notes);
+        
+        return interview;
     }
     
     /**
-     * Helper method to find a candidate by ID
-     * @param candidateId The candidate ID
-     * @return The candidate if found, null otherwise
+     * Helper method to find an applicant by ID
+     * @param applicantId The applicant ID
+     * @return Optional containing the applicant if found
      */
-    private Candidate findCandidate(String candidateId) {
-        CandidateDao candidateDao = new CandidateDaoJdbc(connection);
-        return candidateDao.find(candidateId);
+    private Optional<Applicant> findApplicant(String applicantId) {
+        ApplicantDao applicantDao = new ApplicantDaoJdbc(connection);
+        return applicantDao.find(applicantId);
+    }
+    
+    /**
+     * Helper method to find a recruitment by ID
+     * @param recruitmentId The recruitment ID
+     * @return Optional containing the recruitment if found
+     */
+    private Optional<Recruitment> findRecruitment(String recruitmentId) {
+        RecruitmentDao recruitmentDao = new RecruitmentDaoJdbc(connection);
+        return recruitmentDao.find(recruitmentId);
     }
     
     @Override
-    public Interview find(String id) {
+    public Optional<Interview> find(String id) {
         String sql = "SELECT * FROM interviews WHERE id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, id);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                return map(rs);
+                return Optional.of(map(rs));
             }
         } catch (SQLException e) {
             System.err.println("Error finding interview: " + e.getMessage());
         }
-        return null;
+        return Optional.empty();
     }
     
     @Override
@@ -90,69 +124,66 @@ public class InterviewDaoJdbc implements InterviewDao {
     }
     
     @Override
-    public boolean insert(Interview interview) {
-        String sql = "INSERT INTO interviews (id, candidate_id, date, result) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+    public void insert(Interview interview) {
+        String sql = "INSERT INTO interviews (id, recruitment_id, applicant_id, date_time, location, interviewer, status, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, interview.getId());
-            pstmt.setString(2, interview.getCandidate().getId());
-            pstmt.setString(3, interview.getDate().toString()); // ISO-8601 format
-            pstmt.setString(4, interview.getResult());
+            pstmt.setString(2, interview.getRecruitment().getId());
+            pstmt.setString(3, interview.getApplicant().getId());
+            pstmt.setObject(4, interview.getDateTime());
+            pstmt.setString(5, interview.getLocation());
+            pstmt.setString(6, interview.getInterviewer());
+            pstmt.setString(7, interview.getStatus().name());
+            pstmt.setString(8, interview.getNotes());
             
-            int affectedRows = pstmt.executeUpdate();
-            if (affectedRows == 0) {
-                return false;
-            }
-            
-            try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
-                // If using auto-increment keys, we would handle them here
-                return true;
-            }
+            pstmt.executeUpdate();
         } catch (SQLException e) {
             System.err.println("Error inserting interview: " + e.getMessage());
-            return false;
         }
     }
     
     @Override
-    public boolean update(Interview interview) {
-        String sql = "UPDATE interviews SET candidate_id = ?, date = ?, result = ? WHERE id = ?";
+    public void update(Interview interview) {
+        String sql = "UPDATE interviews SET recruitment_id = ?, applicant_id = ?, date_time = ?, location = ?, interviewer = ?, status = ?, notes = ? WHERE id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, interview.getCandidate().getId());
-            pstmt.setString(2, interview.getDate().toString()); // ISO-8601 format
-            pstmt.setString(3, interview.getResult());
-            pstmt.setString(4, interview.getId());
+            pstmt.setString(1, interview.getRecruitment().getId());
+            pstmt.setString(2, interview.getApplicant().getId());
+            pstmt.setObject(3, interview.getDateTime());
+            pstmt.setString(4, interview.getLocation());
+            pstmt.setString(5, interview.getInterviewer());
+            pstmt.setString(6, interview.getStatus().name());
+            pstmt.setString(7, interview.getNotes());
+            pstmt.setString(8, interview.getId());
             
-            return pstmt.executeUpdate() > 0;
+            pstmt.executeUpdate();
         } catch (SQLException e) {
             System.err.println("Error updating interview: " + e.getMessage());
-            return false;
         }
     }
     
     @Override
-    public boolean delete(String id) {
+    public void delete(String id) {
         String sql = "DELETE FROM interviews WHERE id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, id);
-            return pstmt.executeUpdate() > 0;
+            pstmt.executeUpdate();
         } catch (SQLException e) {
             System.err.println("Error deleting interview: " + e.getMessage());
-            return false;
         }
     }
     
     @Override
-    public List<Interview> findByCandidate(Candidate candidate) {
+    public List<Interview> findByApplicant(String applicantId) {
         List<Interview> interviews = new ArrayList<>();
-        String sql = "SELECT * FROM interviews WHERE candidate_id = ?";
+        String sql = "SELECT * FROM interviews WHERE applicant_id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, candidate.getId());
+            pstmt.setString(1, applicantId);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 interviews.add(map(rs));
             }
         } catch (SQLException e) {
-            System.err.println("Error finding interviews by candidate: " + e.getMessage());
+            System.err.println("Error finding interviews by applicant: " + e.getMessage());
         }
         return interviews;
     }

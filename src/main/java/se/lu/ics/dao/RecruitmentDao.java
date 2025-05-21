@@ -1,6 +1,7 @@
 package se.lu.ics.dao;
 
 import java.util.List;
+import java.util.Optional;
 import se.lu.ics.model.Recruitment;
 
 /**
@@ -11,9 +12,9 @@ public interface RecruitmentDao {
     /**
      * Find a recruitment by its ID
      * @param id The recruitment ID
-     * @return The recruitment if found, null otherwise
+     * @return Optional containing the recruitment if found, empty otherwise
      */
-    Recruitment find(String id);
+    Optional<Recruitment> find(long id);
     
     /**
      * Find all recruitments
@@ -22,23 +23,27 @@ public interface RecruitmentDao {
     List<Recruitment> findAll();
     
     /**
-     * Insert a new recruitment
+     * Insert a new recruitment and set its generated ID
      * @param recruitment The recruitment to insert
-     * @return true if successful, false otherwise
      */
-    boolean insert(Recruitment recruitment);
+    void insert(Recruitment recruitment);
     
     /**
      * Update an existing recruitment
      * @param recruitment The recruitment to update
-     * @return true if successful, false otherwise
      */
-    boolean update(Recruitment recruitment);
+    void update(Recruitment recruitment);
     
     /**
      * Delete a recruitment
      * @param id The ID of the recruitment to delete
-     * @return true if successful, false otherwise
      */
-    boolean delete(String id);
+    void delete(long id);
+    
+    /**
+     * Find recruitments by role ID
+     * @param roleId The role ID to find recruitments for
+     * @return List of recruitments for the given role
+     */
+    List<Recruitment> findByRole(long roleId);
 } 

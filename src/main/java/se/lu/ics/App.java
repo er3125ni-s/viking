@@ -6,39 +6,44 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
+import javax.sql.DataSource;
+
+import se.lu.ics.dao.*;
+import se.lu.ics.model.*;          // om MainViewController ligger här
+import se.lu.ics.service.DatabaseService;
 import se.lu.ics.service.RecruitmentService;
 
 public class App extends Application {
-    private static RecruitmentService recruitmentService;
-    
+
     @Override
-    public void start(Stage primaryStage) throws Exception {
-        // Initialize the recruitment service
-        recruitmentService = new RecruitmentService();
-        
-        // Load the main view
+    public void start(Stage stage) throws Exception {
+
+        /* ───── 1. DataSource från vår singleton ───── */
+        DataSource ds = DatabaseService.getDataSource();
+
+        /* ───── 2. DAO-objekt ───── */
+        RoleDao        roleDao = new RoleDaoJdbc(ds);
+        RecruitmentDao recDao  = new RecruitmentDaoJdbc(ds);
+        ApplicantDao   appDao  = new ApplicantDaoJdbc(ds);      // <─ bytte namn
+        InterviewDao   intDao  = new InterviewDaoJdbc(ds);
+
+        /* ───── 3. Service-lager ───── */
+        RecruitmentService service =
+            new RecruitmentService(roleDao, recDao, appDao, intDao);
+
+        /* ───── 4. Ladda FXML & injicera service ───── */
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MainView.fxml"));
+        loader.setControllerFactory(t -> new MainViewController(service));
         Parent root = loader.load();
-        
-        // Set up the primary stage
-        primaryStage.setTitle("VikingExpress Recruitment System");
-        primaryStage.setScene(new Scene(root));
-        primaryStage.setOnCloseRequest(e -> {
-            // Close database connection on application exit
-            if (recruitmentService != null) {
-                recruitmentService.close();
-            }
-            Platform.exit();
-        });
-        
-        primaryStage.show();
-    }
-    
-    public static RecruitmentService getRecruitmentService() {
-        return recruitmentService;
+
+        stage.setTitle("VikingExpress Recruitment System");
+        stage.setScene(new Scene(root));
+        stage.setOnCloseRequest(e -> Platform.exit());
+        stage.show();
     }
 
     public static void main(String[] args) {
         launch(args);
     }
-} 
+}
