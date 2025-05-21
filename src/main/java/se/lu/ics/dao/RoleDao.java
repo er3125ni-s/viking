@@ -14,7 +14,7 @@ public interface RoleDao {
      * @param id The role ID
      * @return Optional containing the role if found, empty otherwise
      */
-    Optional<Role> find(long id);
+    Optional<Role> find(String id);
     
     /**
      * Find all roles
@@ -38,5 +38,5 @@ public interface RoleDao {
      * Delete a role
      * @param id The ID of the role to delete
      */
-    void delete(long id);
+    void delete(String id);
 } 

@@ -3,7 +3,6 @@ package se.lu.ics.dao;
 import java.util.List;
 import java.util.Optional;
 import se.lu.ics.model.Interview;
-import se.lu.ics.model.Applicant;
 
 /**
  * Data Access Object interface for Interview entities.
@@ -24,7 +23,7 @@ public interface InterviewDao {
     List<Interview> findAll();
     
     /**
-     * Insert a new interview and set its generated ID
+     * Insert a new interview
      * @param interview The interview to insert
      */
     void insert(Interview interview);
@@ -42,9 +41,16 @@ public interface InterviewDao {
     void delete(String id);
     
     /**
-     * Find interviews by applicant
-     * @param applicantId The ID of the applicant to find interviews for
-     * @return List of interviews for the given applicant
+     * Find all interviews for a recruitment
+     * @param recruitmentId The recruitment ID
+     * @return List of interviews for the recruitment
+     */
+    List<Interview> findByRecruitment(String recruitmentId);
+    
+    /**
+     * Find all interviews for an applicant
+     * @param applicantId The applicant ID
+     * @return List of interviews for the applicant
      */
     List<Interview> findByApplicant(String applicantId);
 } 

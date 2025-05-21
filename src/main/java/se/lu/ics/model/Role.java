@@ -5,86 +5,85 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Domänklass för en roll/befattning.
- * Innehåller ingen databaskod – all persistens hanteras av RoleDao.
+ * Represents a job role or position in the company.
  */
 public class Role {
-
-    /** Primärnyckel – null tills DAO:n sparar objektet. */
-    private Long id;
-
+    private String id;
     private String title;
     private String description;
     private String department;
 
-    /** Aggregat: alla rekryteringar som hör till rollen. */
-    private final List<Recruitment> recruitments = new ArrayList<>();
+    /**
+     * Default constructor
+     */
+    public Role() {
+        this.id = "";
+        this.title = "";
+        this.description = "";
+        this.department = "";
+    }
 
-    /** Hjälpfält för snabb visning i UI:t. */
-    private int ongoingRecruitments;
+    /**
+     * Constructor with title and department
+     * @param title The job title
+     * @param department The department
+     */
+    public Role(String title, String department) {
+        this.id = "";
+        this.title = title;
+        this.department = department;
+        this.description = "";
+    }
 
-    /* ---------- Konstruktorer ---------- */
-
-    public Role() { /* för ramverk / JAXB / JavaFX */ }
-
-    public Role(String title, String description, String department) {
-        this.title       = title;
+    /**
+     * Constructor with all fields
+     * @param id The role ID
+     * @param title The job title
+     * @param description The job description
+     * @param department The department
+     */
+    public Role(String id, String title, String description, String department) {
+        this.id = id;
+        this.title = title;
         this.description = description;
-        this.department  = department;
+        this.department = department;
     }
 
-    /* ---------- Affärsmetoder ---------- */
-
-    public void addRecruitment(Recruitment recruitment) {
-        recruitments.add(recruitment);
-        if (recruitment.getStatus() == RecruitmentStatus.ACTIVE) {
-            ongoingRecruitments++;
-        }
+    // Getters and Setters
+    public String getId() {
+        return id;
     }
 
-    public void removeRecruitment(Recruitment recruitment) {
-        recruitments.remove(recruitment);
-        if (recruitment.getStatus() == RecruitmentStatus.ACTIVE) {
-            ongoingRecruitments--;
-        }
+    public void setId(String id) {
+        this.id = id;
     }
 
-    /* ---------- Getters / Setters ---------- */
-
-    public Long   getId()          { return id; }
-    public void   setId(Long id)   { this.id = id; }
-
-    public String getTitle()       { return title; }
-    public void   setTitle(String title) { this.title = title; }
-
-    public String getDescription() { return description; }
-    public void   setDescription(String description) { this.description = description; }
-
-    public String getDepartment()  { return department; }
-    public void   setDepartment(String department) { this.department = department; }
-
-    public List<Recruitment> getRecruitments() { return recruitments; }
-
-    public int getOngoingRecruitments() { return ongoingRecruitments; }
-
-    /* ---------- equals / hashCode ---------- */
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Role role)) return false;
-        return Objects.equals(id, role.id);
+    public String getTitle() {
+        return title;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    /* ---------- toString ---------- */
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
 
     @Override
     public String toString() {
-        return title;
+        return title + " (" + department + ")";
     }
 }

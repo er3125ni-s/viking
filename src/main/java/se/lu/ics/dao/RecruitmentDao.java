@@ -14,7 +14,7 @@ public interface RecruitmentDao {
      * @param id The recruitment ID
      * @return Optional containing the recruitment if found, empty otherwise
      */
-    Optional<Recruitment> find(long id);
+    Optional<Recruitment> find(String id);
     
     /**
      * Find all recruitments
@@ -23,7 +23,7 @@ public interface RecruitmentDao {
     List<Recruitment> findAll();
     
     /**
-     * Insert a new recruitment and set its generated ID
+     * Insert a new recruitment
      * @param recruitment The recruitment to insert
      */
     void insert(Recruitment recruitment);
@@ -38,12 +38,12 @@ public interface RecruitmentDao {
      * Delete a recruitment
      * @param id The ID of the recruitment to delete
      */
-    void delete(long id);
+    void delete(String id);
     
     /**
      * Find recruitments by role ID
-     * @param roleId The role ID to find recruitments for
+     * @param roleId The role ID
      * @return List of recruitments for the given role
      */
-    List<Recruitment> findByRole(long roleId);
+    List<Recruitment> findByRole(String roleId);
 } 

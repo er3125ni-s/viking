@@ -3,7 +3,6 @@ package se.lu.ics.dao;
 import java.util.List;
 import java.util.Optional;
 import se.lu.ics.model.Applicant;
-import se.lu.ics.model.Recruitment;
 
 /**
  * Data Access Object interface for Applicant entities.
@@ -24,7 +23,7 @@ public interface ApplicantDao {
     List<Applicant> findAll();
     
     /**
-     * Insert a new applicant and set its generated ID
+     * Insert a new applicant
      * @param applicant The applicant to insert
      */
     void insert(Applicant applicant);
@@ -42,9 +41,15 @@ public interface ApplicantDao {
     void delete(String id);
     
     /**
-     * Find applicants by recruitment
-     * @param recruitment The recruitment to find applicants for
-     * @return List of applicants for the given recruitment
+     * Find all applicants for a recruitment
+     * @param recruitmentId The recruitment ID
+     * @return List of applicants for the recruitment
      */
     List<Applicant> findByRecruitment(String recruitmentId);
+    
+    /**
+     * Count all applicants in the system
+     * @return The total number of applicants
+     */
+    int countAll();
 } 

@@ -1,20 +1,26 @@
 package se.lu.ics.model;
 
+/**
+ * Enum representing the status of an interview.
+ */
 public enum InterviewStatus {
-    SCHEDULED("Scheduled"),
-    COMPLETED("Completed"),
-    CANCELLED("Cancelled"),
-    RESCHEDULED("Rescheduled"),
-    NO_SHOW("No Show");
-
-    private final String displayName;
-
-    InterviewStatus(String displayName) {
-        this.displayName = displayName;
-    }
-
-    @Override
-    public String toString() {
-        return displayName;
-    }
+    /**
+     * Interview is scheduled but has not yet occurred
+     */
+    SCHEDULED,
+    
+    /**
+     * Interview has been rescheduled to a new date/time
+     */
+    RESCHEDULED,
+    
+    /**
+     * Interview has been completed
+     */
+    COMPLETED,
+    
+    /**
+     * Interview has been cancelled
+     */
+    CANCELLED
 } 

@@ -21,4 +21,6 @@ module se.lu.ics {
     exports se.lu.ics.controller;
     exports se.lu.ics.model;
     exports se.lu.ics.service;
+    exports se.lu.ics.exception;
+    exports se.lu.ics.dao;
 }

@@ -28,6 +28,7 @@
         </Menu>
         <Menu text="Reports" style="-fx-font-size: 13px;">
             <MenuItem text="Recruitment Statistics" onAction="#handleRecruitmentStats" style="-fx-font-size: 13px;"/>
+            <MenuItem text="View Detailed Reports" onAction="#handleViewReports" style="-fx-font-size: 13px;"/>
         </Menu>
     </MenuBar>
 
