@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="se.lu.ics.controller.MainViewController"
+      spacing="15"
+      style="-fx-background-color: #f8f9fa;">
+    <padding>
+        <Insets top="15" right="20" bottom="15" left="20"/>
+    </padding>
+    
+    <MenuBar style="-fx-background-color: white; -fx-border-color: #e9ecef; -fx-border-width: 0 0 1 0;">
+        <Menu text="File" style="-fx-font-size: 13px;">
+            <MenuItem text="Exit" onAction="#handleExit" style="-fx-font-size: 13px;"/>
+        </Menu>
+        <Menu text="Recruitment" style="-fx-font-size: 13px;">
+            <MenuItem text="New Recruitment" onAction="#handleNewRecruitment" style="-fx-font-size: 13px;"/>
+            <MenuItem text="View All Recruitments" onAction="#handleViewRecruitments" style="-fx-font-size: 13px;"/>
+        </Menu>
+        <Menu text="Roles" style="-fx-font-size: 13px;">
+            <MenuItem text="Manage Roles" onAction="#handleManageRoles" style="-fx-font-size: 13px;"/>
+        </Menu>
+        <Menu text="Reports" style="-fx-font-size: 13px;">
+            <MenuItem text="Recruitment Statistics" onAction="#handleRecruitmentStats" style="-fx-font-size: 13px;"/>
+        </Menu>
+    </MenuBar>
+
+    <TabPane VBox.vgrow="ALWAYS" style="-fx-background-color: white; -fx-border-color: #e9ecef; -fx-border-radius: 5;">
+        <Tab text="Active Recruitments" closable="false">
+            <VBox spacing="15">
+                <padding>
+                    <Insets top="15" right="15" bottom="15" left="15"/>
+                </padding>
+                <Text text="Active Recruitment Positions" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-fill: #212529;"/>
+                <TableView fx:id="recruitmentTable" VBox.vgrow="ALWAYS" style="-fx-background-color: white; -fx-border-color: #e9ecef;">
+                    <columns>
+                        <TableColumn fx:id="idColumn" text="ID" prefWidth="100" style="-fx-font-size: 13px;"/>
+                        <TableColumn fx:id="roleColumn" text="Role" prefWidth="200" style="-fx-font-size: 13px;"/>
+                        <TableColumn fx:id="deadlineColumn" text="Application Deadline" prefWidth="150" style="-fx-font-size: 13px;"/>
+                        <TableColumn fx:id="applicantsColumn" text="Applicants" prefWidth="100" style="-fx-font-size: 13px;"/>
+                        <TableColumn fx:id="statusColumn" text="Status" prefWidth="100" style="-fx-font-size: 13px;"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </Tab>
+        
+        <Tab text="Interviews" closable="false">
+            <VBox spacing="15">
+                <padding>
+                    <Insets top="15" right="15" bottom="15" left="15"/>
+                </padding>
+                <Text text="Interview Schedule" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-fill: #212529;"/>
+                <TableView fx:id="interviewTable" VBox.vgrow="ALWAYS" style="-fx-background-color: white; -fx-border-color: #e9ecef;">
+                    <columns>
+                        <TableColumn fx:id="interviewDateColumn" text="Date" prefWidth="150" style="-fx-font-size: 13px;"/>
+                        <TableColumn fx:id="interviewApplicantColumn" text="Applicant" prefWidth="200" style="-fx-font-size: 13px;"/>
+                        <TableColumn fx:id="interviewRoleColumn" text="Role" prefWidth="200" style="-fx-font-size: 13px;"/>
+                        <TableColumn fx:id="interviewerColumn" text="Interviewer" prefWidth="150" style="-fx-font-size: 13px;"/>
+                        <TableColumn fx:id="interviewStatusColumn" text="Status" prefWidth="100" style="-fx-font-size: 13px;"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </Tab>
+        
+        <Tab text="Statistics" closable="false">
+            <VBox spacing="20">
+                <padding>
+                    <Insets top="20" right="20" bottom="20" left="20"/>
+                </padding>
+                <Text text="Recruitment Analytics" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-fill: #212529;"/>
+                <GridPane hgap="30" vgap="25" style="-fx-background-color: white; -fx-padding: 25; -fx-border-color: #e9ecef; -fx-border-radius: 5;">
+                    <Label text="Average Days to Acceptance:" style="-fx-font-size: 14px; -fx-text-fill: #495057;" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <Label fx:id="avgDaysLabel" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #0d6efd;" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    
+                    <Label text="Average Interviews per Offer:" style="-fx-font-size: 14px; -fx-text-fill: #495057;" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                    <Label fx:id="avgInterviewsLabel" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #0d6efd;" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                    
+                    <Label text="Most Popular Role:" style="-fx-font-size: 14px; -fx-text-fill: #495057;" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                    <Label fx:id="popularRoleLabel" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #0d6efd;" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                </GridPane>
+            </VBox>
+        </Tab>
+    </TabPane>
+</VBox> 
